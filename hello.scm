@@ -10,6 +10,10 @@
 
 (enable-sxml #t)
 
+(let ((old-sxml->html (sxml->html)))
+  (sxml->html (lambda (sxml)
+                (old-sxml->html (pre-post-order* sxml informal-rules)))))
+
 ; Automatic Reload
 (add-request-handler-hook!
    'reload-on-request
@@ -23,13 +27,13 @@
   (lambda ()
     (set-page-title! "Contact")
     `((h1 "Contact")
-      (form (@ (method "POST") (action ,send-page))
-          (input (@ (type "text") (name "name") (placeholder "Your Name")))
-          (input (@ (type "email") (name "email") (placeholder "Your Mail Address")))
-          (textarea (@ (name "request") (placeholder "Your Request")))
-          (input (@ (type "submit") (value "Send Request")))
-        )
-      ))
+      (informal
+       (@ (method "POST") (action ,send-page))
+       (fields
+        (field string "name" label: "Your Name")
+        (field string "email" label: "Your Mail Address")
+        (field text "request" label: "Your Request")
+        (field submit "Send Request")))))
   doctype: "<!DOCTYPE html>"
   method: '(GET))
 
